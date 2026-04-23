@@ -26,7 +26,7 @@ export async function loadTokenSource(
   }
   catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    throw new Error(`无法解析 token 文件 ${source}: ${message}`)
+    throw new Error(`Failed to parse token file ${source}: ${message}`)
   }
 }
 
@@ -117,7 +117,7 @@ async function readSourceContent(
   const response = await fetchImpl(source.value)
 
   if (!response.ok) {
-    throw new Error(`请求 ${source.value} 失败: ${response.status} ${response.statusText}`)
+    throw new Error(`Request to ${source.value} failed: ${response.status} ${response.statusText}`)
   }
 
   return response.text()
