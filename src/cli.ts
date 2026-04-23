@@ -28,7 +28,7 @@ cli
 void main()
 
 /**
- * 解析命令行参数并执行导出
+ * Parse command line arguments and run the export.
  */
 async function main(): Promise<void> {
   const parsed = cli.parse()

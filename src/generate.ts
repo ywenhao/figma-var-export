@@ -9,7 +9,7 @@ import type {
 type TokenMap = Map<string, TokenPrimitiveValue>
 
 /**
- * 生成 light 和 dark 对应的 CSS 变量内容
+ * Generate CSS variable output for the light and dark themes.
  */
 export function generateThemeCss(
   lightTokens: TokenTree,
@@ -47,7 +47,7 @@ export function generateThemeCss(
 }
 
 /**
- * 平铺 token 树
+ * Flatten the token tree.
  */
 function flattenTokens(
   node: TokenTree | TokenPrimitiveValue | TokenLeaf | undefined,
@@ -75,7 +75,7 @@ function flattenTokens(
 }
 
 /**
- * 判断当前节点是不是 token 叶子
+ * Check whether the current node is a token leaf.
  */
 function isTokenLeaf(value: unknown): value is TokenLeaf {
   if (!value || typeof value !== 'object') {
@@ -86,7 +86,7 @@ function isTokenLeaf(value: unknown): value is TokenLeaf {
 }
 
 /**
- * 统一 token 名称格式
+ * Normalize the token name format.
  */
 function normalizeTokenName(name: string): string {
   return name
@@ -95,7 +95,7 @@ function normalizeTokenName(name: string): string {
 }
 
 /**
- * 格式化 token 值
+ * Format a token value.
  */
 function formatTokenValue(value: TokenPrimitiveValue | undefined): string {
   if (typeof value === 'string') {
@@ -117,7 +117,7 @@ function formatTokenValue(value: TokenPrimitiveValue | undefined): string {
 }
 
 /**
- * 格式化颜色值
+ * Format a color value.
  */
 function formatColorValue(value: TokenColorValue): string {
   const alpha = value.alpha ?? 1
@@ -131,7 +131,7 @@ function formatColorValue(value: TokenColorValue): string {
 }
 
 /**
- * 格式化透明度
+ * Format an alpha value.
  */
 function formatAlpha(alpha: number): string {
   const percentage = Math.round(alpha * 1000) / 10

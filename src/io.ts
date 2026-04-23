@@ -12,7 +12,7 @@ import { DEFAULT_OUT_FILE_NAME } from './constants'
 import { generateThemeCss } from './generate'
 
 /**
- * 读取单个 token 来源
+ * Load a single token source.
  */
 export async function loadTokenSource(
   source: string,
@@ -31,7 +31,7 @@ export async function loadTokenSource(
 }
 
 /**
- * 读取 light 和 dark token 后生成 CSS 文件
+ * Generate a CSS file from the light and dark token sources.
  */
 export async function exportThemeCss(options: ExportThemeCssOptions): Promise<ExportThemeCssResult> {
   const cwd = options.cwd ?? process.cwd()
@@ -60,7 +60,7 @@ export async function exportThemeCss(options: ExportThemeCssOptions): Promise<Ex
 }
 
 /**
- * 解析 token 来源是本地文件还是远程地址
+ * Resolve whether a token source is a local file or a remote URL.
  */
 function resolveTokenSource(
   source: string,
@@ -104,7 +104,7 @@ function resolveTokenSource(
 }
 
 /**
- * 按来源读取原始内容
+ * Read the raw content based on the source type.
  */
 async function readSourceContent(
   source: { type: 'file', value: string } | { type: 'url', value: string },
