@@ -1,40 +1,38 @@
 # figma-var-export
 
-[简体中文](./README.zh-CN.md)
+根据 Figma 的 light 和 dark token JSON 文件生成 CSS 变量。
 
-Generate CSS variables from Figma light and dark token JSON files.
+## 功能
 
-## Features
+- 生成单个 `vars.css` 文件
+- 支持本地绝对路径输入
+- 支持本地相对路径输入
+- 支持 `http` 和 `https` 远程 token JSON
+- 支持绝对路径和相对路径输出目录
+- 不传 `--out-dir` 时默认输出到当前执行目录
 
-- Generate a single `vars.css` file
-- Support local files with absolute paths
-- Support local files with relative paths
-- Support remote token JSON files over `http` and `https`
-- Write output to an absolute or relative directory
-- Use the current working directory when `--out-dir` is not provided
-
-## Install
+## 安装
 
 ```bash
 pnpm add figma-var-export
 ```
 
-## CLI
+## 命令行
 
 ```bash
 figma-var-export --light-file ./Light.tokens.json --dark-file ./Dark.tokens.json
 figma-var-export --light-file https://example.com/light.json --dark-file https://example.com/dark.json --out-dir ./generated
 ```
 
-### Options
+### 参数
 
-- `--light-file`: Light token file path or URL
-- `--dark-file`: Dark token file path or URL
-- `--out-dir`: Output directory path, defaults to the current working directory
+- `--light-file`: light token 文件路径或 URL
+- `--dark-file`: dark token 文件路径或 URL
+- `--out-dir`: 输出目录路径，默认当前执行目录
 
-The CLI writes `vars.css` to the output directory.
+命令执行后会在输出目录中生成 `vars.css`。
 
-## Output Example
+## 输出示例
 
 ```css
 :root {
@@ -46,7 +44,7 @@ The CLI writes `vars.css` to the output directory.
 }
 ```
 
-## Library Usage
+## 库调用
 
 ```ts
 import { exportThemeCss, generateThemeCss, loadTokenSource } from 'figma-var-export'
