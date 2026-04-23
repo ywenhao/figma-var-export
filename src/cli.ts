@@ -17,9 +17,9 @@ const packageJson = require('../package.json') as { version: string }
 const cli = cac('figma-var-export')
 
 cli
-  .option('--light-file <source>', 'Light token 文件路径或网络地址')
-  .option('--dark-file <source>', 'Dark token 文件路径或网络地址')
-  .option('--out-dir <dir>', '输出目录，默认当前执行目录')
+  .option('--light-file <source>', 'Path or URL to the light token file')
+  .option('--dark-file <source>', 'Path or URL to the dark token file')
+  .option('--out-dir <dir>', 'Output directory, defaults to the current working directory')
   .example('figma-var-export --light-file ./Light.tokens.json --dark-file ./Dark.tokens.json')
   .example('figma-var-export --light-file https://example.com/light.json --dark-file https://example.com/dark.json --out-dir ./generated')
   .help()
@@ -35,7 +35,7 @@ async function main(): Promise<void> {
   const options = parsed.options as CliOptions
 
   if (!options.lightFile || !options.darkFile) {
-    console.error('请提供 --light-file 和 --dark-file 参数')
+    console.error('Please provide both --light-file and --dark-file arguments.')
     cli.outputHelp()
     process.exitCode = 1
     return
@@ -48,8 +48,8 @@ async function main(): Promise<void> {
       outDir: options.outDir,
     })
 
-    console.log(`已生成变量文件: ${result.outFile}`)
-    console.log(`默认输出文件名: ${DEFAULT_OUT_FILE_NAME}`)
+    console.log(`Generated variable file: ${result.outFile}`)
+    console.log(`Default output filename: ${DEFAULT_OUT_FILE_NAME}`)
   }
   catch (error) {
     console.error(error instanceof Error ? error.message : String(error))
