@@ -64,7 +64,7 @@ function flattenTokens(
   }
 
   for (const [key, value] of Object.entries(node)) {
-    if (key === '$extensions') {
+    if (isTokenMetadataKey(key)) {
       continue
     }
 
@@ -83,6 +83,13 @@ function isTokenLeaf(value: unknown): value is TokenLeaf {
   }
 
   return '$type' in value && '$value' in value
+}
+
+/**
+ * Check whether the current key is token metadata.
+ */
+function isTokenMetadataKey(key: string): boolean {
+  return key.startsWith('$')
 }
 
 /**
