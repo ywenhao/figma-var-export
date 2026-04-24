@@ -1,5 +1,8 @@
 import type {
   GenerateThemeCssOptions,
+  GenerateThemeModesCssOptions,
+  ResolvePrimaryThemeModeOptions,
+  ThemeMode,
   TokenColorValue,
   TokenLeaf,
   TokenPrimitiveValue,
@@ -7,6 +10,7 @@ import type {
 } from './types'
 
 type TokenMap = Map<string, TokenPrimitiveValue>
+const DEFAULT_PRIMARY_MODE_NAMES = ['Light', 'Main']
 
 /**
  * Generate CSS variable output for the light and dark themes.
@@ -16,34 +20,102 @@ export function generateThemeCss(
   darkTokens: TokenTree,
   options: GenerateThemeCssOptions = {},
 ): string {
-  const endOfLine = options.endOfLine ?? '\n'
-  const lightFlat = flattenTokens(lightTokens)
-  const darkFlat = flattenTokens(darkTokens)
-  const lightKeys = Array.from(lightFlat.keys())
-  const darkOverrideKeys = Array.from(darkFlat.keys()).filter((key) => {
-    const lightValue = lightFlat.get(key)
-    const darkValue = darkFlat.get(key)
-    return formatTokenValue(lightValue) !== formatTokenValue(darkValue)
-  })
+  return generateThemeModesCss(
+    [
+      { name: 'Light', tokens: lightTokens },
+      { name: 'Dark', tokens: darkTokens },
+    ],
+    {
+      endOfLine: options.endOfLine,
+      primaryModeName: 'Light',
+    },
+  )
+}
 
+/**
+ * Generate CSS variable output for multiple theme modes.
+ */
+export function generateThemeModesCss(
+  modes: ThemeMode[],
+  options: GenerateThemeModesCssOptions = {},
+): string {
+  const endOfLine = options.endOfLine ?? '\n'
+  const primaryModeName = resolvePrimaryThemeModeName(
+    modes.map(mode => mode.name),
+    options,
+  )
+  const primaryMode = findModeByName(modes, primaryModeName)
+  const primaryFlat = flattenTokens(primaryMode.tokens)
+  const primaryKeys = Array.from(primaryFlat.keys())
   const lines: string[] = []
 
   lines.push(':root {')
-  for (const key of lightKeys) {
-    lines.push(`  --${normalizeTokenName(key)}: ${formatTokenValue(lightFlat.get(key))};`)
+  for (const key of primaryKeys) {
+    lines.push(`  --${normalizeTokenName(key)}: ${formatTokenValue(primaryFlat.get(key))};`)
   }
   lines.push('}')
 
-  if (darkOverrideKeys.length > 0) {
+  for (const mode of modes) {
+    if (isSameModeName(mode.name, primaryModeName)) {
+      continue
+    }
+
+    const modeFlat = flattenTokens(mode.tokens)
+    const overrideKeys = Array.from(modeFlat.keys()).filter((key) => {
+      const primaryValue = primaryFlat.get(key)
+      const modeValue = modeFlat.get(key)
+      return formatTokenValue(primaryValue) !== formatTokenValue(modeValue)
+    })
+
+    if (overrideKeys.length === 0) {
+      continue
+    }
+
     lines.push('')
-    lines.push('.dark {')
-    for (const key of darkOverrideKeys) {
-      lines.push(`  --${normalizeTokenName(key)}: ${formatTokenValue(darkFlat.get(key))};`)
+    lines.push(`${toModeSelector(mode.name)} {`)
+    for (const key of overrideKeys) {
+      lines.push(`  --${normalizeTokenName(key)}: ${formatTokenValue(modeFlat.get(key))};`)
     }
     lines.push('}')
   }
 
   return lines.join(endOfLine)
+}
+
+/**
+ * Resolve which mode should be used as the primary theme.
+ */
+export function resolvePrimaryThemeModeName(
+  modeNames: string[],
+  options: ResolvePrimaryThemeModeOptions = {},
+): string {
+  if (modeNames.length === 0) {
+    throw new Error('At least one theme mode is required.')
+  }
+
+  if (options.primaryModeName) {
+    const explicitMode = modeNames.find(modeName => isSameModeName(modeName, options.primaryModeName!))
+
+    if (!explicitMode) {
+      throw new Error(
+        `Primary mode "${options.primaryModeName}" was not found. Available modes: ${modeNames.join(', ')}`,
+      )
+    }
+
+    return explicitMode
+  }
+
+  const preferredNames = options.preferredPrimaryModeNames ?? DEFAULT_PRIMARY_MODE_NAMES
+
+  for (const preferredName of preferredNames) {
+    const preferredMode = modeNames.find(modeName => isSameModeName(modeName, preferredName))
+
+    if (preferredMode) {
+      return preferredMode
+    }
+  }
+
+  return modeNames[0]
 }
 
 /**
@@ -93,12 +165,50 @@ function isTokenMetadataKey(key: string): boolean {
 }
 
 /**
+ * Find a mode by name.
+ */
+function findModeByName(modes: ThemeMode[], modeName: string): ThemeMode {
+  const mode = modes.find(item => isSameModeName(item.name, modeName))
+
+  if (!mode) {
+    throw new Error(`Theme mode "${modeName}" was not found.`)
+  }
+
+  return mode
+}
+
+/**
+ * Check whether two mode names are equal.
+ */
+function isSameModeName(left: string, right: string): boolean {
+  return left.localeCompare(right, undefined, { sensitivity: 'accent' }) === 0
+}
+
+/**
  * Normalize the token name format.
  */
 function normalizeTokenName(name: string): string {
   return name
     .replace(/\s+/g, '-')
     .replace(/\./g, '-')
+}
+
+/**
+ * Convert a mode name to a CSS selector.
+ */
+function toModeSelector(modeName: string): string {
+  const normalizedModeName = modeName
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+  const className = normalizedModeName.length === 0
+    ? 'theme-mode'
+    : /^\d/.test(normalizedModeName)
+      ? `theme-${normalizedModeName}`
+      : normalizedModeName
+
+  return `.${className}`
 }
 
 /**

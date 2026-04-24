@@ -20,9 +20,26 @@ export interface GenerateThemeCssOptions {
   endOfLine?: '\n' | '\r\n'
 }
 
+export interface ResolvePrimaryThemeModeOptions {
+  preferredPrimaryModeNames?: string[]
+  primaryModeName?: string
+}
+
+export interface GenerateThemeModesCssOptions extends GenerateThemeCssOptions, ResolvePrimaryThemeModeOptions {}
+
 export interface LoadTokenSourceOptions {
   cwd?: string
   fetchImpl?: typeof fetch
+}
+
+export interface ThemeMode {
+  name: string
+  tokens: TokenTree
+}
+
+export interface ThemeModeSource {
+  name: string
+  source: string
 }
 
 export type ExportThemeCssOptions = GenerateThemeCssOptions & LoadTokenSourceOptions & {
@@ -32,8 +49,16 @@ export type ExportThemeCssOptions = GenerateThemeCssOptions & LoadTokenSourceOpt
   outFileName?: string
 }
 
+export type ExportThemeModesCssOptions = GenerateThemeModesCssOptions & LoadTokenSourceOptions & {
+  modes: ThemeModeSource[]
+  outDir?: string
+  outFileName?: string
+}
+
 export interface ExportThemeCssResult {
   css: string
+  modeNames: string[]
   outDir: string
   outFile: string
+  primaryModeName: string
 }
