@@ -2,7 +2,7 @@ import { defineConfig } from 'tsdown'
 import { StaleGuardRecorder } from 'tsdown-stale-guard'
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/cli.ts'],
+  entry: ['src/index.ts', 'src/browser.ts', 'src/cli.ts'],
   format: ['esm', 'cjs'],
   platform: 'node',
   target: 'node18',
