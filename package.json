@@ -1,7 +1,7 @@
 {
   "name": "figma-var-export",
   "type": "module",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Generate CSS variables from Figma light and dark token files",
   "author": "ywenhao",
   "license": "MIT",
