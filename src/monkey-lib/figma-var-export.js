@@ -112,6 +112,8 @@
 
     const observer = new MutationObserver(scheduleScan)
     observer.observe(root, {
+      attributes: true,
+      attributeFilter: ['data-is-positioned'],
       childList: true,
       subtree: true,
     })
